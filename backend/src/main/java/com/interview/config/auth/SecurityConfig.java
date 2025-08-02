@@ -1,5 +1,6 @@
 package com.interview.config.auth;
 
+import com.interview.config.CorrelationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +35,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CorrelationFilter correlationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             // Disable CSRF (not needed for JWT)
             .csrf(AbstractHttpConfigurer::disable)
+
+            // Add correlation filter FIRST - before any security processing
+            .addFilterBefore(correlationFilter, UsernamePasswordAuthenticationFilter.class)
 
             // Handle response format for 401 and 403 exceptions
             .exceptionHandling(exceptions -> exceptions
@@ -76,8 +81,8 @@ public class SecurityConfig {
             // Stateless session management (JWT doesn't need sessions)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // Add JWT filter before username/password authentication filter
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            // Add JWT filter AFTER correlation filter
+            .addFilterAfter(jwtAuthenticationFilter, CorrelationFilter.class)
 
             // Disable frame options for H2 console - this should be removed for production
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
