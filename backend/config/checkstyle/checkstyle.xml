@@ -56,6 +56,11 @@
         <property name="files" value="com.interview.repository.*"/>
     </module>
 
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="MissingJavadocMethod"/>
+        <property name="files" value="com.interview.validation.*"/>
+    </module>
+
     <module name="BeforeExecutionExclusionFileFilter">
         <property name="fileNamePattern" value="module\-info\.java$"/>
     </module>

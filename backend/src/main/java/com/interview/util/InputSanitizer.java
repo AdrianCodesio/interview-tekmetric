@@ -1,8 +1,8 @@
 package com.interview.util;
 
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import org.springframework.web.util.HtmlUtils;
-import java.util.regex.Pattern;
 
 /**
  * Utility class for sanitizing input using Spring's HtmlUtils.

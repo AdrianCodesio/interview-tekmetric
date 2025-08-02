@@ -31,6 +31,12 @@ public @interface SafeText {
      */
     TextType type() default TextType.GENERAL;
 
+    /**
+     * Enumeration of text field types for targeted validation rules.
+     *
+     * <p>Each type applies specific character restrictions and validation patterns
+     * appropriate for the field's intended use case.
+     */
     enum TextType {
         GENERAL,    // General text with basic XSS protection
         NAME,       // Names (letters, spaces, apostrophes, hyphens)
