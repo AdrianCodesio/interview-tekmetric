@@ -60,13 +60,13 @@ public class SecurityConfig {
                 .permitAll()
 
                 // Customer API authorization rules
-                .requestMatchers(HttpMethod.GET, "/v1/customers/**")
+                .requestMatchers(HttpMethod.GET, "/api/v1/customers/**")
                 .hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/v1/customers/**")
+                .requestMatchers(HttpMethod.POST, "/api/v1/customers/**")
                 .hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/v1/customers/**")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/customers/**")
                 .hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/v1/customers/**")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/customers/**")
                 .hasRole("ADMIN")
 
                 // All other endpoints require authentication
