@@ -4,6 +4,8 @@ import com.interview.dto.CustomerRequest;
 import com.interview.dto.CustomerResponse;
 import com.interview.entity.Customer;
 import com.interview.entity.CustomerProfile;
+import com.interview.exception.CustomerAlreadyExistsException;
+import com.interview.exception.CustomerNotFoundException;
 import com.interview.mapper.CustomerMapper;
 import com.interview.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +35,7 @@ public class CustomerService {
 
         // Check if customer with email already exists
         if (customerRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Customer with email " + request.email() + " already exists");
+            throw new CustomerAlreadyExistsException(request.email());
         }
 
         // Create customer entity
@@ -59,7 +61,7 @@ public class CustomerService {
         log.debug("Fetching customer with ID: {}", id);
 
         Customer customer = customerRepository.findByIdWithProfile(id)
-            .orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + id));
+            .orElseThrow(() -> new CustomerNotFoundException(id));
 
         return customerMapper.toResponse(customer);
     }
@@ -92,12 +94,12 @@ public class CustomerService {
         log.debug("Updating customer with ID: {}", id);
 
         Customer existingCustomer = customerRepository.findByIdWithProfile(id)
-            .orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + id));
+            .orElseThrow(() -> new CustomerNotFoundException(id));
 
         // Check if email is changing and new email already exists
         if (!existingCustomer.getEmail().equals(request.email()) &&
             customerRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Customer with email " + request.email() + " already exists");
+            throw new CustomerAlreadyExistsException(request.email());
         }
 
         // Update customer fields
@@ -130,7 +132,7 @@ public class CustomerService {
         log.debug("Deleting customer with ID: {}", id);
 
         if (!customerRepository.existsById(id)) {
-            throw new IllegalArgumentException("Customer not found with ID: " + id);
+            throw new CustomerNotFoundException(id);
         }
 
         customerRepository.deleteById(id);
