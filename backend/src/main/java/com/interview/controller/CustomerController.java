@@ -2,7 +2,15 @@ package com.interview.controller;
 
 import com.interview.dto.CustomerRequest;
 import com.interview.dto.CustomerResponse;
+import com.interview.dto.ErrorResponse;
+import com.interview.dto.ValidationErrorResponse;
 import com.interview.service.CustomerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +59,16 @@ public class CustomerController {
     /**
      * Create a new customer with profile.
      */
+    @Operation(summary = "Create a new customer", description = "Creates a new customer with optional profile information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Customer created successfully",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomerResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid input data - validation failed",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationErrorResponse.class))),
+        @ApiResponse(responseCode = "409", description = "Customer with email already exists",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Internal server error",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     @PostMapping
     public ResponseEntity<CustomerResponse> createCustomer(@Valid @RequestBody CustomerRequest request) {
         log.info("Creating customer with email: {}", request.email());
@@ -62,6 +80,14 @@ public class CustomerController {
     /**
      * Get customer by ID (includes profile data).
      */
+    @Operation(summary = "Get customer by ID", description = "Retrieves a customer by their unique identifier, including profile information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Customer found successfully",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomerResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Customer not found",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Internal server error",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     @GetMapping("/{id}")
     public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable Long id) {
         log.info("Fetching customer with ID: {}", id);
@@ -73,6 +99,13 @@ public class CustomerController {
     /**
      * Get all customers (includes profile data).
      */
+    @Operation(summary = "Get all customers", description = "Retrieves all customers with their profile information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Customers retrieved successfully",
+                     content = @Content(mediaType = "application/json",
+                                        array = @ArraySchema(schema = @Schema(implementation = CustomerResponse.class)))),
+        @ApiResponse(responseCode = "500", description = "Internal server error",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     @GetMapping
     public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
         log.info("Fetching all customers");
@@ -84,6 +117,12 @@ public class CustomerController {
     /**
      * Get customers with pagination (includes profile data).
      */
+    @Operation(summary = "Get customers with pagination", description = "Retrieves customers with pagination support, including profile information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Customers retrieved successfully with pagination",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+        @ApiResponse(responseCode = "500", description = "Internal server error",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     @GetMapping("/paginated")
     public ResponseEntity<Page<CustomerResponse>> getCustomersWithPagination(Pageable pageable) {
         log.info("Fetching customers with pagination: {}", pageable);
@@ -95,9 +134,20 @@ public class CustomerController {
     /**
      * Update customer and profile.
      */
+    @Operation(summary = "Update customer", description = "Updates customer information and profile data")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Customer updated successfully",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomerResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid input data - validation failed",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Customer not found",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "409", description = "Customer with email already exists",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Internal server error",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable Long id,
-        @Valid @RequestBody CustomerRequest request) {
+    public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerRequest request) {
         log.info("Updating customer with ID: {}", id);
 
         CustomerResponse response = customerService.updateCustomer(id, request);
@@ -107,6 +157,13 @@ public class CustomerController {
     /**
      * Delete customer (profile deleted automatically).
      */
+    @Operation(summary = "Delete customer", description = "Deletes a customer and their associated profile information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Customer deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Customer not found",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Internal server error",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         log.info("Deleting customer with ID: {}", id);

@@ -1,7 +1,7 @@
 package com.interview.config;
 
 import com.interview.dto.ErrorResponse;
-import com.interview.dto.ErrorResponse.ValidationError;
+import com.interview.dto.ValidationErrorResponse;
 import com.interview.exception.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -57,22 +57,22 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleValidationException(
+    public ResponseEntity<ValidationErrorResponse> handleValidationException(
         MethodArgumentNotValidException ex, HttpServletRequest request) {
 
         log.warn("Validation failed: {}", ex.getMessage());
 
-        List<ValidationError> validationErrors = ex.getBindingResult()
+        List<ValidationErrorResponse.ValidationError> validationErrors = ex.getBindingResult()
             .getFieldErrors()
             .stream()
-            .map(error -> new ValidationError(
+            .map(error -> new ValidationErrorResponse.ValidationError(
                 error.getField(),
                 error.getRejectedValue(),
                 error.getDefaultMessage()
             ))
             .toList();
 
-        ErrorResponse errorResponse = ErrorResponse.withValidationErrors(
+        ValidationErrorResponse errorResponse = ValidationErrorResponse.withValidationErrors(
             VALIDATION_ERROR_CODE,
             VALIDATION_ERROR_MESSAGE,
             request.getRequestURI(),
