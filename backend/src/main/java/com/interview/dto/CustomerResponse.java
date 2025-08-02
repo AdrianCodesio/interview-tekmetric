@@ -16,5 +16,7 @@ public record CustomerResponse(
     LocalDate dateOfBirth,
     ContactMethod preferredContactMethod,
     LocalDateTime createdDate,
-    LocalDateTime updatedDate
+    LocalDateTime updatedDate,
+    String createdBy,
+    String updatedBy
 ) {}

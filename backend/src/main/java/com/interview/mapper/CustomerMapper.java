@@ -48,6 +48,8 @@ public interface CustomerMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "customerProfile", ignore = true)
     void updateEntity(@MappingTarget Customer existingCustomer, CustomerRequest request);
 
