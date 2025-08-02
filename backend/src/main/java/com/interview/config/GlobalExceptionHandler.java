@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * <p>Handles all exceptions thrown by controllers and converts them into
  * appropriate HTTP responses with consistent error structure. Provides
  * centralized error handling for business exceptions, validation errors,
- * and unexpected exceptions.
+ * authentication/authorization failures, and unexpected exceptions.
  */
 @Slf4j
 @ControllerAdvice

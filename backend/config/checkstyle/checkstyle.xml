@@ -43,6 +43,11 @@
 
     <module name="SuppressionSingleFilter">
         <property name="checks" value="MissingJavadocMethod"/>
+        <property name="files" value="com.interview.config.*"/>
+    </module>
+
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="MissingJavadocMethod"/>
         <property name="files" value="com.interview.Application"/>
     </module>
 

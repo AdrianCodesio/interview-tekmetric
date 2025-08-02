@@ -10,6 +10,7 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
+    open-in-view: false
 
   h2:
     console:
@@ -24,3 +25,9 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
+
+# JWT Configuration
+app:
+  jwt:
+    secret: mySecretKey123456789012345678901234567890
+    expiration: 86400000 # 24 hours in milliseconds

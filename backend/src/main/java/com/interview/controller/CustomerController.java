@@ -35,6 +35,13 @@ import org.springframework.web.bind.annotation.RestController;
  * including their associated profile information. All endpoints follow RESTful
  * conventions and return appropriate HTTP status codes.
  *
+ * <p><strong>Authentication & Authorization:</strong>
+ * <ul>
+ *   <li><strong>GET operations:</strong> Both ADMIN and USER roles can access</li>
+ *   <li><strong>POST/PUT/DELETE operations:</strong> Only ADMIN role can access</li>
+ *   <li><strong>Authentication:</strong> JWT token required in Authorization header: "Bearer {token}"</li>
+ * </ul>
+ *
  * <p>Supported operations:
  * <ul>
  *   <li>POST /v1/customers - Create a new customer with optional profile</li>
@@ -45,8 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li>DELETE /v1/customers/{id} - Delete customer and associated profile</li>
  * </ul>
  *
- * <p>All endpoints include validation and proper error handling through the
- * global exception handler.
+ * <p>All endpoints include validation and proper error handling through the global exception handler.
  */
 @Slf4j
 @RestController
@@ -65,10 +71,15 @@ public class CustomerController {
                      content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomerResponse.class))),
         @ApiResponse(responseCode = "400", description = "Invalid input data - validation failed",
                      content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationErrorResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Authentication required - missing or invalid JWT token",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "403", description = "Access denied - ADMIN role required",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "409", description = "Customer with email already exists",
                      content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "Internal server error",
-                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping
     public ResponseEntity<CustomerResponse> createCustomer(@Valid @RequestBody CustomerRequest request) {
         log.info("Creating customer with email: {}", request.email());
@@ -84,10 +95,13 @@ public class CustomerController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Customer found successfully",
                      content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomerResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Authentication required - missing or invalid JWT token",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "Customer not found",
                      content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "Internal server error",
-                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/{id}")
     public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable Long id) {
         log.info("Fetching customer with ID: {}", id);
@@ -104,8 +118,11 @@ public class CustomerController {
         @ApiResponse(responseCode = "200", description = "Customers retrieved successfully",
                      content = @Content(mediaType = "application/json",
                                         array = @ArraySchema(schema = @Schema(implementation = CustomerResponse.class)))),
+        @ApiResponse(responseCode = "401", description = "Authentication required - missing or invalid JWT token",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "Internal server error",
-                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping
     public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
         log.info("Fetching all customers");
@@ -121,8 +138,11 @@ public class CustomerController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Customers retrieved successfully with pagination",
                      content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+        @ApiResponse(responseCode = "401", description = "Authentication required - missing or invalid JWT token",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "Internal server error",
-                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/paginated")
     public ResponseEntity<Page<CustomerResponse>> getCustomersWithPagination(Pageable pageable) {
         log.info("Fetching customers with pagination: {}", pageable);
@@ -140,12 +160,17 @@ public class CustomerController {
                      content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomerResponse.class))),
         @ApiResponse(responseCode = "400", description = "Invalid input data - validation failed",
                      content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationErrorResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Authentication required - missing or invalid JWT token",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "403", description = "Access denied - ADMIN role required",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "Customer not found",
                      content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "409", description = "Customer with email already exists",
                      content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "Internal server error",
-                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PutMapping("/{id}")
     public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerRequest request) {
         log.info("Updating customer with ID: {}", id);
@@ -160,10 +185,15 @@ public class CustomerController {
     @Operation(summary = "Delete customer", description = "Deletes a customer and their associated profile information")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Customer deleted successfully"),
+        @ApiResponse(responseCode = "401", description = "Authentication required - missing or invalid JWT token",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "403", description = "Access denied - ADMIN role required",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "Customer not found",
                      content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "Internal server error",
-                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         log.info("Deleting customer with ID: {}", id);
