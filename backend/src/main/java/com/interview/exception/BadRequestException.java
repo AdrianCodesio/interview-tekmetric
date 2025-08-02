@@ -3,7 +3,7 @@ package com.interview.exception;
 import org.springframework.http.HttpStatus;
 
 /**
- * Exception thrown when a request is invalid or malformed
+ * Exception thrown when a request is invalid or malformed.
  */
 public class BadRequestException extends BusinessException {
 

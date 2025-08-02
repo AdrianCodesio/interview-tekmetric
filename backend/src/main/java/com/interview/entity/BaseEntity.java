@@ -1,14 +1,21 @@
 package com.interview.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-
+/**
+ * Abstract base entity providing audit fields for all domain entities.
+ *
+ * <p>Automatically populates createdDate and updatedDate fields using JPA auditing.
+ * All entity classes should extend this to inherit standard audit functionality.
+ */
 @Getter
 @Setter
 @MappedSuperclass

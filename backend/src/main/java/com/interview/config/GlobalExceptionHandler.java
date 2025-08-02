@@ -4,6 +4,7 @@ import com.interview.dto.ErrorResponse;
 import com.interview.dto.ErrorResponse.ValidationError;
 import com.interview.exception.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.List;
-
+/**
+ * Global exception handler for the application.
+ *
+ * <p>Handles all exceptions thrown by controllers and converts them into
+ * appropriate HTTP responses with consistent error structure. Provides
+ * centralized error handling for business exceptions, validation errors,
+ * and unexpected exceptions.
+ */
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -27,7 +34,7 @@ public class GlobalExceptionHandler {
     private static final String INTERNAL_SERVER_ERROR_MESSAGE = "An unexpected error occurred";
 
     /**
-     * Handle all BusinessException types (CustomerNotFoundException, CustomerAlreadyExistsException, etc.)
+     * Handle all BusinessException types (CustomerNotFoundException, CustomerAlreadyExistsException, etc.).
      */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(
@@ -46,7 +53,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle validation errors from @Valid
+     * Handle validation errors from @Valid.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -77,7 +84,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle all unhandled exceptions (both checked and unchecked)
+     * Handle all unhandled exceptions (both checked and unchecked).
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

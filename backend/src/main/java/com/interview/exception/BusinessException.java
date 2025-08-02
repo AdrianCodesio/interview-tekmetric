@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 /**
- * Base exception class for business logic errors
+ * Base exception class for business logic errors.
  */
 @Getter
 public abstract class BusinessException extends RuntimeException {

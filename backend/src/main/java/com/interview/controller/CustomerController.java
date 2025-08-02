@@ -4,16 +4,42 @@ import com.interview.dto.CustomerRequest;
 import com.interview.dto.CustomerResponse;
 import com.interview.service.CustomerService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
+/**
+ * REST controller for managing customer operations.
+ *
+ * <p>This controller provides endpoints for complete CRUD operations on customers,
+ * including their associated profile information. All endpoints follow RESTful
+ * conventions and return appropriate HTTP status codes.
+ *
+ * <p>Supported operations:
+ * <ul>
+ *   <li>POST /v1/customers - Create a new customer with optional profile</li>
+ *   <li>GET /v1/customers/{id} - Retrieve a customer by ID</li>
+ *   <li>GET /v1/customers - Retrieve all customers</li>
+ *   <li>GET /api/v1/customers/paginated?page=0&size=10&sort=firstName,asc - Retrieve customers with pagination</li>
+ *   <li>PUT /v1/customers/{id} - Update customer and profile information</li>
+ *   <li>DELETE /v1/customers/{id} - Delete customer and associated profile</li>
+ * </ul>
+ *
+ * <p>All endpoints include validation and proper error handling through the
+ * global exception handler.
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -23,8 +49,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     /**
-     * Create a new customer with profile
-     * POST /api/v1/customers
+     * Create a new customer with profile.
      */
     @PostMapping
     public ResponseEntity<CustomerResponse> createCustomer(@Valid @RequestBody CustomerRequest request) {
@@ -35,8 +60,7 @@ public class CustomerController {
     }
 
     /**
-     * Get customer by ID (includes profile data)
-     * GET /api/v1/customers/{id}
+     * Get customer by ID (includes profile data).
      */
     @GetMapping("/{id}")
     public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable Long id) {
@@ -47,8 +71,7 @@ public class CustomerController {
     }
 
     /**
-     * Get all customers (includes profile data)
-     * GET /api/v1/customers
+     * Get all customers (includes profile data).
      */
     @GetMapping
     public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
@@ -59,8 +82,7 @@ public class CustomerController {
     }
 
     /**
-     * Get customers with pagination (includes profile data)
-     * GET /api/v1/customers/paginated?page=0&size=10&sort=firstName,asc
+     * Get customers with pagination (includes profile data).
      */
     @GetMapping("/paginated")
     public ResponseEntity<Page<CustomerResponse>> getCustomersWithPagination(Pageable pageable) {
@@ -71,8 +93,7 @@ public class CustomerController {
     }
 
     /**
-     * Update customer and profile
-     * PUT /api/v1/customers/{id}
+     * Update customer and profile.
      */
     @PutMapping("/{id}")
     public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable Long id,
@@ -84,8 +105,7 @@ public class CustomerController {
     }
 
     /**
-     * Delete customer (profile deleted automatically)
-     * DELETE /api/v1/customers/{id}
+     * Delete customer (profile deleted automatically).
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {

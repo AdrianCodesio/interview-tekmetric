@@ -8,6 +8,7 @@ import com.interview.exception.CustomerAlreadyExistsException;
 import com.interview.exception.CustomerNotFoundException;
 import com.interview.mapper.CustomerMapper;
 import com.interview.repository.CustomerRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,8 +16,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
+/**
+ * Service class for managing customer operations including CRUD operations and customer profiles.
+ *
+ * <p>This service handles the business logic for customer management, including:
+ * <ul>
+ *   <li>Creating customers with optional profile data</li>
+ *   <li>Retrieving customers by ID, listing all customers or paginated list of customers</li>
+ *   <li>Updating customer information and profiles</li>
+ *   <li>Deleting customers (cascades to profiles)</li>
+ * </ul>
+ *
+ * <p>All read operations are performed within read-only transactions for optimal performance.
+ * Write operations use full transactions with proper exception handling.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -27,7 +40,7 @@ public class CustomerService {
     private final CustomerMapper customerMapper;
 
     /**
-     * Create a new customer with profile
+     * Create a new customer with profile.
      */
     @Transactional
     public CustomerResponse createCustomer(CustomerRequest request) {
@@ -55,7 +68,7 @@ public class CustomerService {
     }
 
     /**
-     * Get customer by ID (always includes profile data)
+     * Get customer by ID (always includes profile data).
      */
     public CustomerResponse getCustomerById(Long id) {
         log.debug("Fetching customer with ID: {}", id);
@@ -67,7 +80,7 @@ public class CustomerService {
     }
 
     /**
-     * Get all customers (always includes profile data)
+     * Get all customers (always includes profile data).
      */
     public List<CustomerResponse> getAllCustomers() {
         log.debug("Fetching all customers");
@@ -77,7 +90,7 @@ public class CustomerService {
     }
 
     /**
-     * Get customers with pagination (always includes profile data)
+     * Get customers with pagination (always includes profile data).
      */
     public Page<CustomerResponse> getCustomersWithPagination(Pageable pageable) {
         log.debug("Fetching customers with pagination: {}", pageable);
@@ -87,7 +100,7 @@ public class CustomerService {
     }
 
     /**
-     * Update customer and profile
+     * Update customer and profile.
      */
     @Transactional
     public CustomerResponse updateCustomer(Long id, CustomerRequest request) {
@@ -97,8 +110,8 @@ public class CustomerService {
             .orElseThrow(() -> new CustomerNotFoundException(id));
 
         // Check if email is changing and new email already exists
-        if (!existingCustomer.getEmail().equals(request.email()) &&
-            customerRepository.existsByEmail(request.email())) {
+        if (!existingCustomer.getEmail().equals(request.email())
+            && customerRepository.existsByEmail(request.email())) {
             throw new CustomerAlreadyExistsException(request.email());
         }
 
@@ -125,7 +138,7 @@ public class CustomerService {
     }
 
     /**
-     * Delete customer (profile will be deleted automatically due to cascade)
+     * Delete customer (profile will be deleted automatically due to cascade).
      */
     @Transactional
     public void deleteCustomer(Long id) {
@@ -140,11 +153,11 @@ public class CustomerService {
     }
 
     /**
-     * Check if request contains any profile data
+     * Check if request contains any profile data.
      */
     private boolean hasProfileData(CustomerRequest request) {
-        return request.address() != null ||
-            request.dateOfBirth() != null ||
-            request.preferredContactMethod() != null;
+        return request.address() != null
+            || request.dateOfBirth() != null
+            || request.preferredContactMethod() != null;
     }
 }

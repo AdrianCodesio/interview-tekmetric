@@ -3,7 +3,7 @@ package com.interview.exception;
 import org.springframework.http.HttpStatus;
 
 /**
- * Exception thrown when a customer is not found
+ * Exception thrown when a customer is not found.
  */
 public class CustomerNotFoundException extends BusinessException {
 
