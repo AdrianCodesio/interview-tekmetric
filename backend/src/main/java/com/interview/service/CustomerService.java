@@ -85,7 +85,7 @@ public class CustomerService {
     public List<CustomerResponse> getAllCustomers() {
         log.debug("Fetching all customers");
 
-        List<Customer> customers = customerRepository.findAll();
+        List<Customer> customers = customerRepository.findAllWithProfiles();
         return customerMapper.toResponseList(customers);
     }
 
@@ -95,7 +95,7 @@ public class CustomerService {
     public Page<CustomerResponse> getCustomersWithPagination(Pageable pageable) {
         log.debug("Fetching customers with pagination: {}", pageable);
 
-        Page<Customer> customerPage = customerRepository.findAll(pageable);
+        Page<Customer> customerPage = customerRepository.findAllWithProfiles(pageable);
         return customerPage.map(customerMapper::toResponse);
     }
 
@@ -144,11 +144,12 @@ public class CustomerService {
     public void deleteCustomer(Long id) {
         log.debug("Deleting customer with ID: {}", id);
 
-        if (!customerRepository.existsById(id)) {
+        int deletedCount = customerRepository.deleteByCustomerId(id);
+
+        if (deletedCount == 0) {
             throw new CustomerNotFoundException(id);
         }
 
-        customerRepository.deleteById(id);
         log.info("Deleted customer with ID: {}", id);
     }
 

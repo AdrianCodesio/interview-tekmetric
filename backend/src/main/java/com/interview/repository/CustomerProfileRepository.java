@@ -16,10 +16,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CustomerProfileRepository extends JpaRepository<CustomerProfile, Long> {
 
-    Optional<CustomerProfile> findByCustomerId(Long customerId);
-
     @Query("SELECT cp FROM CustomerProfile cp JOIN cp.customer c WHERE c.email = :email")
     Optional<CustomerProfile> findByCustomerEmail(@Param("email") String email);
-
-    boolean existsByCustomerId(Long customerId);
 }
