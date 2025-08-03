@@ -8,6 +8,8 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -81,6 +83,51 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * Handle HTTP method not allowed (405).
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public ResponseEntity<ErrorResponse> handleMethodNotAllowed(
+        HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+
+        log.warn("Method not allowed: {} on {}", ex.getMethod(), request.getRequestURI());
+
+        String supportedMethods = ex.getSupportedHttpMethods() != null
+            ? ex.getSupportedHttpMethods().toString()
+            : "Unknown";
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+            "METHOD_NOT_ALLOWED",
+            String.format("Method '%s' not allowed for this endpoint. Supported methods: %s",
+                ex.getMethod(), supportedMethods),
+            request.getRequestURI(),
+            HttpStatus.METHOD_NOT_ALLOWED.value()
+        );
+
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(errorResponse);
+    }
+
+    /**
+     * Handle HTTP media type not supported (415).
+     */
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+    public ResponseEntity<ErrorResponse> handleUnsupportedMediaType(
+        HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
+
+        log.warn("Unsupported media type: {}", ex.getContentType());
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+            "UNSUPPORTED_MEDIA_TYPE",
+            "Content type '" + ex.getContentType() + "' not supported",
+            request.getRequestURI(),
+            HttpStatus.UNSUPPORTED_MEDIA_TYPE.value()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(errorResponse);
     }
 
     /**
