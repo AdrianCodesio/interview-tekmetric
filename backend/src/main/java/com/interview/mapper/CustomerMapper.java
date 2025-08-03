@@ -24,7 +24,13 @@ public interface CustomerMapper {
      * createdDate and updatedDate are handled by JPA auditing.
      */
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
+    @Mapping(target = "updatedDate", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "customerProfile", ignore = true)
+    @Mapping(target = "vehicles", ignore = true)
+    @Mapping(target = "subscribedPackages", ignore = true)
     Customer toEntity(CustomerRequest request);
 
     /**
@@ -51,6 +57,8 @@ public interface CustomerMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "customerProfile", ignore = true)
+    @Mapping(target = "vehicles", ignore = true)
+    @Mapping(target = "subscribedPackages", ignore = true)
     void updateEntity(@MappingTarget Customer existingCustomer, CustomerRequest request);
 
     /**

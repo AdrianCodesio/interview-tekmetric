@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -35,4 +36,18 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Modifying
     @Query("DELETE FROM Customer c WHERE c.id = :id")
     int deleteByCustomerId(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT c FROM Customer c "
+        + "LEFT JOIN FETCH c.customerProfile "
+        + "LEFT JOIN FETCH c.subscribedPackages "
+        + "WHERE c.id = :id")
+    Optional<Customer> findByIdWithProfileAndServicePackages(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT c FROM Customer c "
+        + "LEFT JOIN FETCH c.customerProfile "
+        + "LEFT JOIN FETCH c.subscribedPackages")
+    List<Customer> findAllWithProfilesAndServicePackages();
+
+    @EntityGraph(attributePaths = {"customerProfile", "servicePackages"})
+    Page<Customer> findAll(Pageable pageable);
 }

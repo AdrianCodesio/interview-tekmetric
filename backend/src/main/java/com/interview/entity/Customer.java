@@ -7,11 +7,16 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,9 +25,14 @@ import lombok.Setter;
 /**
  * Entity representing a customer with basic contact information.
  *
- * <p>Includes optional one-to-one relationship with CustomerProfile for
- * additional customer details and one-to-many relationship with Vehicle.
- * Inherits audit fields from BaseEntity.
+ * <p>Contains relationships to:
+ * <ul>
+ *   <li>CustomerProfile (one-to-one) - Additional customer details</li>
+ *   <li>Vehicle (one-to-many) - Customer's vehicles</li>
+ *   <li>ServicePackage (many-to-many) - Subscribed service packages</li>
+ * </ul>
+ *
+ * <p>Inherits audit fields from BaseEntity.
  */
 @Entity
 @Getter
@@ -58,4 +68,44 @@ public class Customer extends BaseEntity {
                fetch = FetchType.LAZY,
                orphanRemoval = true)
     private List<Vehicle> vehicles = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "customer_service_packages",
+        joinColumns = @JoinColumn(name = "customer_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "service_package_id", referencedColumnName = "id")
+    )
+    private Set<ServicePackage> subscribedPackages = new HashSet<>();
+
+    public void addServicePackage(ServicePackage servicePackage) {
+        if (servicePackage != null) {
+            this.subscribedPackages.add(servicePackage);
+            servicePackage.getSubscribers().add(this);
+        }
+    }
+
+    public void removeServicePackage(ServicePackage servicePackage) {
+        if (servicePackage != null) {
+            this.subscribedPackages.remove(servicePackage);
+            servicePackage.getSubscribers().remove(this);
+        }
+    }
+
+    // Helper method to safely get service packages count
+    public int getServicePackagesCount() {
+        return subscribedPackages != null ? subscribedPackages.size() : 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Customer customer)) return false;
+        return id != null && id.equals(customer.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        // Use class-based hashCode to prevent Set corruption with generated IDs
+        return getClass().hashCode();
+    }
 }

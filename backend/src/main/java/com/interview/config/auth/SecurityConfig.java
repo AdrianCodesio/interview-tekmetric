@@ -84,6 +84,18 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/vehicles/**")
                 .hasRole("ADMIN")
 
+                // ServicePackage API authorization rules
+                .requestMatchers(HttpMethod.GET, "/api/v1/service-packages/**")
+                .hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.POST, "/api/v1/service-packages/**")
+                .hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/service-packages/**")
+                .hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/service-packages/**")
+                .hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/service-packages/**")
+                .hasRole("ADMIN")
+
                 // All other endpoints require authentication
                 .anyRequest()
                 .authenticated())
