@@ -24,6 +24,7 @@ public interface CustomerMapper {
      * createdDate and updatedDate are handled by JPA auditing.
      */
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
@@ -52,6 +53,7 @@ public interface CustomerMapper {
      * Profile updates will be handled separately in service layer.
      */
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     @Mapping(target = "createdBy", ignore = true)

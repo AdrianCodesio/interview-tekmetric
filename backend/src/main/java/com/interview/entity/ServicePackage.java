@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -77,20 +78,19 @@ public class ServicePackage extends BaseEntity {
         return Boolean.TRUE.equals(this.active);
     }
 
-    public int getCustomersCount() {
-        return subscribers != null ? subscribers.size() : 0;
-    }
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ServicePackage that)) return false;
-        return id != null && id.equals(that.getId());
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ServicePackage servicePackage)) {
+            return false;
+        }
+        return Objects.equals(name, servicePackage.name);
     }
 
     @Override
     public int hashCode() {
-        // Use class-based hashCode to prevent Set corruption with generated IDs
-        return getClass().hashCode();
+        return Objects.hash(name);
     }
 }

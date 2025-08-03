@@ -13,9 +13,11 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -46,6 +48,9 @@ public class Customer extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
     @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
 
@@ -58,23 +63,15 @@ public class Customer extends BaseEntity {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @OneToOne(mappedBy = "customer",
-              cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-              fetch = FetchType.LAZY,
-              orphanRemoval = true)
+    @OneToOne(mappedBy = "customer", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY, orphanRemoval = true)
     private CustomerProfile customerProfile;
 
-    @OneToMany(mappedBy = "customer",
-               fetch = FetchType.LAZY,
-               orphanRemoval = true)
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Vehicle> vehicles = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "customer_service_packages",
-        joinColumns = @JoinColumn(name = "customer_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "service_package_id", referencedColumnName = "id")
-    )
+    @JoinTable(name = "customer_service_packages", joinColumns = @JoinColumn(name = "customer_id", referencedColumnName = "id"),
+               inverseJoinColumns = @JoinColumn(name = "service_package_id", referencedColumnName = "id"))
     private Set<ServicePackage> subscribedPackages = new HashSet<>();
 
     public void addServicePackage(ServicePackage servicePackage) {
@@ -91,21 +88,19 @@ public class Customer extends BaseEntity {
         }
     }
 
-    // Helper method to safely get service packages count
-    public int getServicePackagesCount() {
-        return subscribedPackages != null ? subscribedPackages.size() : 0;
-    }
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Customer customer)) return false;
-        return id != null && id.equals(customer.getId());
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Customer customer)) {
+            return false;
+        }
+        return Objects.equals(email, customer.email);
     }
 
     @Override
     public int hashCode() {
-        // Use class-based hashCode to prevent Set corruption with generated IDs
-        return getClass().hashCode();
+        return Objects.hash(email);
     }
 }

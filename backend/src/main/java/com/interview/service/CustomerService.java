@@ -4,8 +4,10 @@ import com.interview.dto.CustomerRequest;
 import com.interview.dto.CustomerResponse;
 import com.interview.entity.Customer;
 import com.interview.entity.CustomerProfile;
+import com.interview.exception.BadRequestException;
 import com.interview.exception.CustomerAlreadyExistsException;
 import com.interview.exception.CustomerNotFoundException;
+import com.interview.exception.OptimisticLockingException;
 import com.interview.mapper.CustomerMapper;
 import com.interview.repository.CustomerRepository;
 import java.util.List;
@@ -35,6 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CustomerService {
+
+    public static final String CUSTOMER = "Customer";
+    public static final String VERSION_IS_REQUIRED = "Version is required for updates. Please include the current version from GET response.";
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
@@ -73,8 +78,7 @@ public class CustomerService {
     public CustomerResponse getCustomerById(Long id) {
         log.debug("Fetching customer with ID: {}", id);
 
-        Customer customer = customerRepository.findByIdWithProfile(id)
-            .orElseThrow(() -> new CustomerNotFoundException(id));
+        Customer customer = customerRepository.findByIdWithProfile(id).orElseThrow(() -> new CustomerNotFoundException(id));
 
         return customerMapper.toResponse(customer);
     }
@@ -103,17 +107,16 @@ public class CustomerService {
      * Update customer and profile.
      */
     @Transactional
-    public CustomerResponse updateCustomer(Long id, CustomerRequest request) {
-        log.debug("Updating customer with ID: {}", id);
+    public void updateCustomer(Long customerId, CustomerRequest request) {
+        log.debug("Updating customer with ID: {} with version: {}", customerId, request.version());
 
-        Customer existingCustomer = customerRepository.findByIdWithProfile(id)
-            .orElseThrow(() -> new CustomerNotFoundException(id));
+        validateUpdateRequest(request);
 
-        // Check if email is changing and new email already exists
-        if (!existingCustomer.getEmail().equals(request.email())
-            && customerRepository.existsByEmail(request.email())) {
-            throw new CustomerAlreadyExistsException(request.email());
-        }
+        Customer existingCustomer = customerRepository.findByIdWithProfile(customerId)
+            .orElseThrow(() -> new CustomerNotFoundException(customerId));
+
+        validateOptimisticLocking(customerId, request.version(), existingCustomer.getVersion());
+        validateEmailUniqueness(request.email(), existingCustomer.getEmail());
 
         // Update customer fields
         customerMapper.updateEntity(existingCustomer, request);
@@ -131,10 +134,13 @@ public class CustomerService {
             }
         }
 
-        Customer updatedCustomer = customerRepository.save(existingCustomer);
-
-        log.info("Updated customer with ID: {}", updatedCustomer.getId());
-        return customerMapper.toResponse(updatedCustomer);
+        try {
+            Customer updatedCustomer = customerRepository.save(existingCustomer);
+            log.info("Updated customer with ID: {} to version: {}", updatedCustomer.getId(), updatedCustomer.getVersion());
+        } catch (jakarta.persistence.OptimisticLockException | org.springframework.orm.ObjectOptimisticLockingFailureException ex) {
+            log.warn("Optimistic locking failure during save for customer ID: {}", customerId, ex);
+            throw new OptimisticLockingException(CUSTOMER, customerId);
+        }
     }
 
     /**
@@ -154,11 +160,38 @@ public class CustomerService {
     }
 
     /**
+     * Validate version on update request.
+     */
+    private void validateUpdateRequest(CustomerRequest request) {
+        if (request.version() == null) {
+            throw new BadRequestException(VERSION_IS_REQUIRED);
+        }
+    }
+
+    /**
+     * Validate optimistic locking version.
+     */
+    private void validateOptimisticLocking(Long customerId, Long requestVersion, Long currentVersion) {
+        if (!requestVersion.equals(currentVersion)) {
+            log.warn("Optimistic locking conflict for customer ID: {}. Expected version: {}, but current version: {}",
+                customerId, requestVersion, currentVersion);
+            throw new OptimisticLockingException(CUSTOMER, customerId);
+        }
+    }
+
+    /**
+     * Validate email uniqueness when email is being changed.
+     */
+    private void validateEmailUniqueness(String newEmail, String currentEmail) {
+        if (!currentEmail.equals(newEmail) && customerRepository.existsByEmail(newEmail)) {
+            throw new CustomerAlreadyExistsException(newEmail);
+        }
+    }
+
+    /**
      * Check if request contains any profile data.
      */
     private boolean hasProfileData(CustomerRequest request) {
-        return request.address() != null
-            || request.dateOfBirth() != null
-            || request.preferredContactMethod() != null;
+        return request.address() != null || request.dateOfBirth() != null || request.preferredContactMethod() != null;
     }
 }

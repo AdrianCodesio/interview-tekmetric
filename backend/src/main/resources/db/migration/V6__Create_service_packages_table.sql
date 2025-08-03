@@ -5,12 +5,12 @@
 CREATE TABLE service_packages
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name          VARCHAR(100) NOT NULL,
+    name          VARCHAR(100)   NOT NULL UNIQUE,
     description   TEXT,
-    monthly_price DECIMAL(10,2) NOT NULL,
-    active        BOOLEAN      NOT NULL DEFAULT TRUE,
-    created_date  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_date  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    monthly_price DECIMAL(10, 2) NOT NULL,
+    active        BOOLEAN        NOT NULL DEFAULT TRUE,
+    created_date  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by    VARCHAR(100),
     updated_by    VARCHAR(100)
 );

@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record CustomerResponse(
     Long id,
+    Long version,
     String firstName,
     String lastName,
     String email,

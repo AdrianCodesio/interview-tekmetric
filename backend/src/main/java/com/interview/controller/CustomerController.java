@@ -52,6 +52,15 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li>DELETE /api/v1/customers/{id} - Delete customer and associated profile</li>
  * </ul>
  *
+ * <p><strong>Optimistic Locking:</strong>
+ * The Customer entity uses optimistic locking with a version field to handle concurrent updates.
+ * When updating a customer:
+ * <ul>
+ *   <li>Include the current version from GET response in your PUT request</li>
+ *   <li>If another user modified the customer, you'll receive HTTP 409 (Conflict)</li>
+ *   <li>Refresh the data and retry with the new version</li>
+ * </ul>
+ *
  * <p>All endpoints include validation and proper error handling through the global exception handler.
  */
 @Slf4j
@@ -175,8 +184,8 @@ public class CustomerController {
     public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerRequest request) {
         log.info("Updating customer with ID: {}", id);
 
-        CustomerResponse response = customerService.updateCustomer(id, request);
-        return ResponseEntity.ok(response);
+        customerService.updateCustomer(id, request);
+        return ResponseEntity.ok(customerService.getCustomerById(id));
     }
 
     /**
