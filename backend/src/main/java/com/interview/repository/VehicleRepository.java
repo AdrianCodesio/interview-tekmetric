@@ -36,28 +36,11 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long>, JpaSpec
            countQuery = "SELECT count(v) FROM Vehicle v")
     Page<Vehicle> findAllWithCustomers(Pageable pageable);
 
-    /**
-     * Find vehicles using Specification with EntityGraph to eagerly fetch customer and profile.
-     * This prevents N+1 queries when filtering vehicles and accessing customer data.
-     */
     @EntityGraph(attributePaths = {"customer", "customer.customerProfile"})
     Page<Vehicle> findAll(Specification<Vehicle> spec, Pageable pageable);
 
-    /**
-     * Find vehicles using Specification with EntityGraph to eagerly fetch customer and profile.
-     * This prevents N+1 queries when filtering vehicles and accessing customer data.
-     */
     @EntityGraph(attributePaths = {"customer", "customer.customerProfile"})
     List<Vehicle> findAll(Specification<Vehicle> spec);
-
-    @Query("SELECT v FROM Vehicle v LEFT JOIN FETCH v.customer c LEFT JOIN FETCH c.customerProfile WHERE v.customer.id = :customerId")
-    List<Vehicle> findByCustomerIdWithCustomer(@Param("customerId") Long customerId);
-
-    @Query("SELECT v FROM Vehicle v WHERE v.vin = :vin")
-    Optional<Vehicle> findByVin(@Param("vin") String vin);
-
-    @Query("SELECT v FROM Vehicle v WHERE v.make = :make AND v.model = :model")
-    List<Vehicle> findByMakeAndModel(@Param("make") String make, @Param("model") String model);
 
     @Modifying
     @Query("DELETE FROM Vehicle v WHERE v.id = :id")

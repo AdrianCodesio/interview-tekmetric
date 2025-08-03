@@ -14,9 +14,9 @@ import org.springframework.web.util.HtmlUtils;
 public class InputSanitizer {
 
     // Valid character patterns for different field types
-    private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z\\s'.-]+$");
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[\\p{L}\\s'.-]+$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^[+]?[0-9\\s().-]+$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+?[0-9\\s()\\-.]{1,20}$");
 
     /**
      * Sanitize input using Spring's HTML escaping.

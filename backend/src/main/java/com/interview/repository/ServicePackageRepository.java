@@ -47,22 +47,4 @@ public interface ServicePackageRepository extends JpaRepository<ServicePackage, 
     @EntityGraph(attributePaths = {"subscribers"})
     @Query("SELECT sp FROM ServicePackage sp")
     Page<ServicePackage> findAll(Pageable pageable);
-
-    @Query("SELECT sp FROM ServicePackage sp JOIN sp.subscribers c WHERE c.id = :customerId")
-    List<ServicePackage> findByCustomerId(@Param("customerId") Long customerId);
-
-    @Query("SELECT sp FROM ServicePackage sp JOIN sp.subscribers c WHERE c.email = :email")
-    List<ServicePackage> findByCustomerEmail(@Param("email") String email);
-
-    @Query("SELECT COUNT(c) FROM ServicePackage sp JOIN sp.subscribers c WHERE sp.id = :servicePackageId")
-    Long countSubscribers(@Param("servicePackageId") Long servicePackageId);
-
-    List<ServicePackage> findByActiveTrue();
-
-    @Query("SELECT sp FROM ServicePackage sp WHERE UPPER(sp.name) LIKE UPPER(CONCAT('%', :name, '%'))")
-    List<ServicePackage> findByNameContainingIgnoreCase(@Param("name") String name);
-
-    @Modifying
-    @Query("UPDATE ServicePackage sp SET sp.active = false WHERE sp.id = :id")
-    int deactivateServicePackage(@Param("id") Long id);
 }

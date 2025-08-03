@@ -64,8 +64,7 @@ public class VehicleService {
 
         // Create vehicle entity
         Vehicle vehicle = vehicleMapper.toEntity(request);
-        Customer customerRef = new Customer();
-        customerRef.setId(request.customerId());
+        Customer customerRef = customerRepository.getReferenceById(request.customerId());
         vehicle.setCustomer(customerRef);
 
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
