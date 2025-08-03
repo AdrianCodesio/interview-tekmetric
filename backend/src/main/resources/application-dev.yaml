@@ -11,6 +11,9 @@ spring:
       ddl-auto: none
     show-sql: true
     open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
 
   h2:
     console:
@@ -25,6 +28,10 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
+
+logging:
+  level:
+    com.interview: DEBUG
 
 # JWT Configuration
 app:
