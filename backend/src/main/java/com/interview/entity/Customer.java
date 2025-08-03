@@ -7,10 +7,12 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,12 +21,12 @@ import lombok.Setter;
  * Entity representing a customer with basic contact information.
  *
  * <p>Includes optional one-to-one relationship with CustomerProfile for
- * additional customer details. Inherits audit fields from BaseEntity.
+ * additional customer details and one-to-many relationship with Vehicle.
+ * Inherits audit fields from BaseEntity.
  */
 @Entity
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "customers")
@@ -51,4 +53,9 @@ public class Customer extends BaseEntity {
               fetch = FetchType.LAZY,
               orphanRemoval = true)
     private CustomerProfile customerProfile;
+
+    @OneToMany(mappedBy = "customer",
+               fetch = FetchType.LAZY,
+               orphanRemoval = true)
+    private List<Vehicle> vehicles = new ArrayList<>();
 }
