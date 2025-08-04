@@ -18,7 +18,7 @@ CREATE TABLE customer_profiles
 (
     id                       BIGINT AUTO_INCREMENT PRIMARY KEY,
     customer_id              BIGINT NOT NULL UNIQUE,
-    address                  CLOB,
+    address                  TEXT,
     date_of_birth            DATE,
     preferred_contact_method VARCHAR(20) DEFAULT 'EMAIL',
     FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE

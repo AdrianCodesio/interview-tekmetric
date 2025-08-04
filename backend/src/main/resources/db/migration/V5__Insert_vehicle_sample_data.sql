@@ -2,7 +2,7 @@
 -- Insert sample vehicle data for development and testing
 
 -- Insert sample vehicles for existing customers
-INSERT INTO vehicles (customer_id, vin, make, model, "year", created_date, updated_date, created_by, updated_by)
+INSERT INTO vehicles (customer_id, vin, make, model, vehicle_year, created_date, updated_date, created_by, updated_by)
 VALUES
     -- John Doe's vehicles
     (1, '1HGCM82633A123456', 'Honda', 'Accord', 2018, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'SYSTEM', 'SYSTEM'),

@@ -9,7 +9,7 @@ CREATE TABLE vehicles
     vin          VARCHAR(17) NOT NULL UNIQUE,
     make         VARCHAR(50) NOT NULL,
     model        VARCHAR(50) NOT NULL,
-    "year"       INTEGER     NOT NULL,
+    vehicle_year INTEGER     NOT NULL,
     created_date TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_date TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by   VARCHAR(100),
