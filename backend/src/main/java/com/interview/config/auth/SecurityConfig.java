@@ -4,6 +4,7 @@ import com.interview.config.CorrelationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -33,6 +34,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    @Value("${spring.profiles.active:dev}")
+    private String activeProfile;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CorrelationFilter correlationFilter;
@@ -110,8 +114,16 @@ public class SecurityConfig {
             // Add JWT filter AFTER correlation filter
             .addFilterAfter(jwtAuthenticationFilter, CorrelationFilter.class)
 
-            // Disable frame options for H2 console - this should be removed for production
-            .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+            // Configure frame options based on profile
+            .headers(headers -> {
+                if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
+                    // DEV/TEST: Remove protection to allow H2 console frames
+                    headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable);
+                } else {
+                    // PROD: Add protection to prevent clickjacking
+                    headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::deny);
+                }
+            });
 
         return http.build();
     }

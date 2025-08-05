@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
+    // Demo users for interview purposes - replace with proper user management in production
     private static final List<User> USERS = List.of(
         User.builder()
             .username("admin")

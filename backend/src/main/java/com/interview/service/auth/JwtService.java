@@ -20,8 +20,7 @@ import org.springframework.stereotype.Service;
  *
  * <p><strong>Production Considerations:</strong>
  * <ul>
- *   <li><strong>Key Management:</strong> Proper key rotation and secure storage</li>
- *   <li><strong>Token Revocation:</strong> Redis blacklist for logout/security events</li>
+ *   <li><strong>Secret Management:</strong> Use AWS Secrets Manager, Azure Key Vault, or HashiCorp Vault</li>
  *   <li><strong>External IdP:</strong> Could validate tokens from Keycloak, Auth0, AWS Cognito or Azure</li>
  * </ul>
  *
