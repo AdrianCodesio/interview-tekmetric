@@ -87,6 +87,8 @@ public class SecurityConfig {
                 .hasRole("ADMIN")
 
                 // ServicePackage API authorization rules
+                .requestMatchers(HttpMethod.GET, "/api/v1/service-packages/*/subscribers")
+                .hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/v1/service-packages/**")
                 .hasAnyRole("ADMIN", "USER")
                 .requestMatchers(HttpMethod.POST, "/api/v1/service-packages/**")

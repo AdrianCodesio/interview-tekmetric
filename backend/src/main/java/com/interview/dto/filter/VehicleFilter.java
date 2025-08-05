@@ -19,30 +19,4 @@ public record VehicleFilter(
     String customerEmail,
     String customerName
 ) {
-
-    /**
-     * Create an empty filter (no criteria applied).
-     */
-    public static VehicleFilter empty() {
-        return VehicleFilter.builder().build();
-    }
-
-    /**
-     * Create a filter for a specific customer.
-     */
-    public static VehicleFilter forCustomer(Long customerId) {
-        return VehicleFilter.builder()
-            .customerId(customerId)
-            .build();
-    }
-
-    /**
-     * Create a filter for make and model.
-     */
-    public static VehicleFilter forMakeAndModel(String make, String model) {
-        return VehicleFilter.builder()
-            .make(make)
-            .model(model)
-            .build();
-    }
 }
