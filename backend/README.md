@@ -198,6 +198,13 @@ mvn test -Dtest="*IntegrationTest"
 - **Repository Tests**: JPA repositories with H2 in-memory database (@DataJpaTest)
 - **Integration Tests**: Full Spring context with complete request/response cycles
 
+## API Testing with Postman
+
+### Postman Collection
+A comprehensive Postman collection is available for testing all API endpoints:
+
+**Location**: `docs/Tekmetric.postman_collection.json`
+
 ## Configuration Profiles
 ### Development Profile (dev)
 
