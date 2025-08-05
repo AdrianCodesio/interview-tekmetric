@@ -7,6 +7,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 /**
  * MapStruct mapper for converting between ServicePackage entities and DTOs.
@@ -34,8 +35,17 @@ public interface ServicePackageMapper {
      * Convert ServicePackage entity to ServicePackageResponse.
      * Includes subscriber count for business insights.
      */
+    @Named("toResponseWithSubscribers")
     @Mapping(target = "subscriberCount", expression = "java(getSubscriberCount(servicePackage))")
     ServicePackageResponse toResponse(ServicePackage servicePackage);
+
+    /**
+     * Convert ServicePackage entity to ServicePackageResponse (without subscriber count).
+     * Used for operations where subscribers are not loaded to avoid N+1 queries.
+     */
+    @Named("toResponseWithoutSubscribers")
+    @Mapping(target = "subscriberCount", ignore = true)
+    ServicePackageResponse toResponseWithoutSubscribers(ServicePackage servicePackage);
 
     /**
      * Convert list of ServicePackage entities to list of ServicePackageResponse.

@@ -26,6 +26,9 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Query("SELECT c FROM Customer c LEFT JOIN FETCH c.customerProfile WHERE c.id = :id")
     Optional<Customer> findByIdWithProfile(@Param("id") Long id);
 
+    @Query("SELECT c FROM Customer c LEFT JOIN FETCH c.customerProfile LEFT JOIN FETCH c.subscribedPackages WHERE c.id = :id")
+    Optional<Customer> findByIdWithSubscriptions(@Param("id") Long id);
+
     @Query("SELECT c FROM Customer c LEFT JOIN FETCH c.customerProfile")
     List<Customer> findAllWithProfiles();
 

@@ -7,6 +7,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 /**
  * MapStruct mapper for converting between Vehicle entities and DTOs.
@@ -33,10 +34,21 @@ public interface VehicleMapper {
      * Convert Vehicle entity to VehicleResponse.
      * Includes customer information for convenience.
      */
+    @Named("toResponseWithCustomer")
     @Mapping(target = "customerId", source = "customer.id")
     @Mapping(target = "customerName", expression = "java(getCustomerFullName(vehicle))")
     @Mapping(target = "customerEmail", source = "customer.email")
     VehicleResponse toResponse(Vehicle vehicle);
+
+    /**
+     * Convert Vehicle entity to VehicleResponse (for create operations).
+     * Excludes customer details to avoid lazy loading.
+     */
+    @Named("toCreateResponse")
+    @Mapping(target = "customerId", source = "customer.id")
+    @Mapping(target = "customerName", ignore = true)
+    @Mapping(target = "customerEmail", ignore = true)
+    VehicleResponse toCreateResponse(Vehicle vehicle);
 
     /**
      * Convert list of Vehicle entities to list of VehicleResponse.

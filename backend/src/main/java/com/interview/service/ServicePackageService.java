@@ -68,7 +68,7 @@ public class ServicePackageService {
         ServicePackage savedPackage = servicePackageRepository.save(servicePackage);
 
         log.info("Created service package with ID: {} and name: {}", savedPackage.getId(), savedPackage.getName());
-        return servicePackageMapper.toResponse(savedPackage);
+        return servicePackageMapper.toResponseWithoutSubscribers(savedPackage);
     }
 
     /**
@@ -105,7 +105,7 @@ public class ServicePackageService {
         ServicePackage updatedPackage = servicePackageRepository.save(existingPackage);
 
         log.info("Updated service package with ID: {} and name: {}", updatedPackage.getId(), updatedPackage.getName());
-        return servicePackageMapper.toResponse(updatedPackage);
+        return servicePackageMapper.toResponseWithoutSubscribers(updatedPackage);
     }
 
     /**
@@ -139,14 +139,12 @@ public class ServicePackageService {
         Page<ServicePackage> packagePage;
         if (Boolean.TRUE.equals(active)) {
             packagePage = servicePackageRepository.findAllActiveWithSubscribers(pageable);
+        } else if (Boolean.FALSE.equals(active)) {
+            // Get inactive packages only
+            packagePage = servicePackageRepository.findAllInactiveWithSubscribers(pageable);
         } else {
-            // For inactive-only or all packages, we need custom implementation
-            // For now, fallback to all packages (could be optimized with custom query)
+            // Get all packages (active + inactive)
             packagePage = servicePackageRepository.findAllWithSubscribers(pageable);
-            if (Boolean.FALSE.equals(active)) {
-                // Filter inactive only - not ideal for large datasets, but works for demo
-                packagePage = packagePage.map(pkg -> pkg.isActive() ? null : pkg);
-            }
         }
 
         return packagePage.map(servicePackageMapper::toResponse);
@@ -187,7 +185,7 @@ public class ServicePackageService {
         log.debug("Subscribing customer {} to service package {}", customerId, servicePackageId);
 
         // Load entities with their collections
-        Customer customer = customerRepository.findByIdWithProfile(customerId)
+        Customer customer = customerRepository.findByIdWithSubscriptions(customerId)
             .orElseThrow(() -> new CustomerNotFoundException(customerId));
 
         ServicePackage servicePackage = servicePackageRepository.findByIdWithSubscribers(servicePackageId)
@@ -215,7 +213,7 @@ public class ServicePackageService {
     public void unsubscribeCustomerFromPackage(Long servicePackageId, Long customerId) {
         log.debug("Unsubscribing customer {} from service package {}", customerId, servicePackageId);
 
-        Customer customer = customerRepository.findByIdWithProfile(customerId)
+        Customer customer = customerRepository.findByIdWithSubscriptions(customerId)
             .orElseThrow(() -> new CustomerNotFoundException(customerId));
 
         ServicePackage servicePackage = servicePackageRepository.findByIdWithSubscribers(servicePackageId)

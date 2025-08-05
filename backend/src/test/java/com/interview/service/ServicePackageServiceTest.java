@@ -116,7 +116,7 @@ class ServicePackageServiceTest {
             when(servicePackageRepository.existsByName(testRequest.name())).thenReturn(false);
             when(servicePackageMapper.toEntity(testRequest)).thenReturn(testPackage);
             when(servicePackageRepository.save(any(ServicePackage.class))).thenReturn(testPackage);
-            when(servicePackageMapper.toResponse(testPackage)).thenReturn(testResponse);
+            when(servicePackageMapper.toResponseWithoutSubscribers(testPackage)).thenReturn(testResponse);
 
             ServicePackageResponse result = servicePackageService.createServicePackage(testRequest);
 
@@ -242,7 +242,7 @@ class ServicePackageServiceTest {
         void shouldUpdateServicePackageSuccessfully() {
             when(servicePackageRepository.findById(1L)).thenReturn(Optional.of(testPackage));
             when(servicePackageRepository.save(any(ServicePackage.class))).thenReturn(testPackage);
-            when(servicePackageMapper.toResponse(testPackage)).thenReturn(testResponse);
+            when(servicePackageMapper.toResponseWithoutSubscribers(testPackage)).thenReturn(testResponse);
 
             ServicePackageResponse result = servicePackageService.updateServicePackage(1L, testRequest);
 
@@ -277,7 +277,7 @@ class ServicePackageServiceTest {
         void shouldNotCheckNameWhenUnchanged() {
             when(servicePackageRepository.findById(1L)).thenReturn(Optional.of(testPackage));
             when(servicePackageRepository.save(any(ServicePackage.class))).thenReturn(testPackage);
-            when(servicePackageMapper.toResponse(testPackage)).thenReturn(testResponse);
+            when(servicePackageMapper.toResponseWithoutSubscribers(testPackage)).thenReturn(testResponse);
 
             servicePackageService.updateServicePackage(1L, testRequest);
 
@@ -347,7 +347,7 @@ class ServicePackageServiceTest {
         @Test
         @DisplayName("Should subscribe customer to package successfully")
         void shouldSubscribeCustomerToPackage() {
-            when(customerRepository.findByIdWithProfile(1L)).thenReturn(Optional.of(testCustomer));
+            when(customerRepository.findByIdWithSubscriptions(1L)).thenReturn(Optional.of(testCustomer));
             when(servicePackageRepository.findByIdWithSubscribers(1L)).thenReturn(Optional.of(testPackage));
             when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
 
@@ -359,7 +359,7 @@ class ServicePackageServiceTest {
         @Test
         @DisplayName("Should throw exception when customer not found for subscription")
         void shouldThrowExceptionWhenCustomerNotFoundForSubscription() {
-            when(customerRepository.findByIdWithProfile(1L)).thenReturn(Optional.empty());
+            when(customerRepository.findByIdWithSubscriptions(1L)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> servicePackageService.subscribeCustomerToPackage(1L, 1L))
                 .isInstanceOf(CustomerNotFoundException.class);
@@ -370,7 +370,7 @@ class ServicePackageServiceTest {
         @Test
         @DisplayName("Should throw exception when service package not found for subscription")
         void shouldThrowExceptionWhenServicePackageNotFoundForSubscription() {
-            when(customerRepository.findByIdWithProfile(1L)).thenReturn(Optional.of(testCustomer));
+            when(customerRepository.findByIdWithSubscriptions(1L)).thenReturn(Optional.of(testCustomer));
             when(servicePackageRepository.findByIdWithSubscribers(1L)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> servicePackageService.subscribeCustomerToPackage(1L, 1L))
@@ -381,7 +381,7 @@ class ServicePackageServiceTest {
         @DisplayName("Should throw exception when customer already subscribed")
         void shouldThrowExceptionWhenCustomerAlreadySubscribed() {
             testCustomer.getSubscribedPackages().add(testPackage);
-            when(customerRepository.findByIdWithProfile(1L)).thenReturn(Optional.of(testCustomer));
+            when(customerRepository.findByIdWithSubscriptions(1L)).thenReturn(Optional.of(testCustomer));
             when(servicePackageRepository.findByIdWithSubscribers(1L)).thenReturn(Optional.of(testPackage));
 
             assertThatThrownBy(() -> servicePackageService.subscribeCustomerToPackage(1L, 1L))
@@ -396,7 +396,7 @@ class ServicePackageServiceTest {
         void shouldUnsubscribeCustomerFromPackage() {
             testCustomer.getSubscribedPackages().add(testPackage);
             testPackage.getSubscribers().add(testCustomer);
-            when(customerRepository.findByIdWithProfile(1L)).thenReturn(Optional.of(testCustomer));
+            when(customerRepository.findByIdWithSubscriptions(1L)).thenReturn(Optional.of(testCustomer));
             when(servicePackageRepository.findByIdWithSubscribers(1L)).thenReturn(Optional.of(testPackage));
             when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
 
@@ -408,7 +408,7 @@ class ServicePackageServiceTest {
         @Test
         @DisplayName("Should throw exception when customer not subscribed for unsubscription")
         void shouldThrowExceptionWhenCustomerNotSubscribed() {
-            when(customerRepository.findByIdWithProfile(1L)).thenReturn(Optional.of(testCustomer));
+            when(customerRepository.findByIdWithSubscriptions(1L)).thenReturn(Optional.of(testCustomer));
             when(servicePackageRepository.findByIdWithSubscribers(1L)).thenReturn(Optional.of(testPackage));
 
             assertThatThrownBy(() -> servicePackageService.unsubscribeCustomerFromPackage(1L, 1L))

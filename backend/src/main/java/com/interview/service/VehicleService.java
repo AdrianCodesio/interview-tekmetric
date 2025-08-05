@@ -71,7 +71,7 @@ public class VehicleService {
 
         log.info("Created vehicle with ID: {} and VIN: {} for customer ID: {}", savedVehicle.getId(), savedVehicle.getVin(), request.customerId());
 
-        return vehicleMapper.toResponse(savedVehicle);
+        return vehicleMapper.toCreateResponse(savedVehicle);
     }
 
     /**

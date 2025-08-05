@@ -30,21 +30,21 @@ public interface ServicePackageRepository extends JpaRepository<ServicePackage, 
         + "WHERE sp.id = :id")
     Optional<ServicePackage> findByIdWithSubscribers(@Param("id") Long id);
 
-    @Query("SELECT DISTINCT sp FROM ServicePackage sp LEFT JOIN FETCH sp.subscribers s LEFT JOIN FETCH s.customerProfile  WHERE sp.active = true")
+    @Query("SELECT DISTINCT sp FROM ServicePackage sp LEFT JOIN FETCH sp.subscribers s LEFT JOIN FETCH s.customerProfile WHERE sp.active = true")
     List<ServicePackage> findAllActiveWithSubscribers();
 
-    @EntityGraph(attributePaths = {"subscribers"})
+    @EntityGraph(attributePaths = {"subscribers", "subscribers.customerProfile"})
     @Query("SELECT sp FROM ServicePackage sp WHERE sp.active = true")
     Page<ServicePackage> findAllActiveWithSubscribers(Pageable pageable);
 
-    @Query("SELECT DISTINCT sp FROM ServicePackage sp LEFT JOIN FETCH sp.subscribers")
+    @EntityGraph(attributePaths = {"subscribers", "subscribers.customerProfile"})
+    @Query("SELECT sp FROM ServicePackage sp WHERE sp.active = false")
+    Page<ServicePackage> findAllInactiveWithSubscribers(Pageable pageable);
+
+    @Query("SELECT DISTINCT sp FROM ServicePackage sp LEFT JOIN FETCH sp.subscribers s LEFT JOIN FETCH s.customerProfile")
     List<ServicePackage> findAllWithSubscribers();
 
-    @EntityGraph(attributePaths = {"subscribers"})
+    @EntityGraph(attributePaths = {"subscribers", "subscribers.customerProfile"})
     @Query("SELECT sp FROM ServicePackage sp")
     Page<ServicePackage> findAllWithSubscribers(Pageable pageable);
-
-    @EntityGraph(attributePaths = {"subscribers"})
-    @Query("SELECT sp FROM ServicePackage sp")
-    Page<ServicePackage> findAll(Pageable pageable);
 }

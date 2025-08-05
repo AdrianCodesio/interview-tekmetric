@@ -35,6 +35,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private static final String DEV_PROFILE = "dev";
+    private static final String TEST_PROFILE = "test";
+
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
 
@@ -116,7 +119,7 @@ public class SecurityConfig {
 
             // Configure frame options based on profile
             .headers(headers -> {
-                if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
+                if (DEV_PROFILE.equals(activeProfile) || TEST_PROFILE.equals(activeProfile)) {
                     // DEV/TEST: Remove protection to allow H2 console frames
                     headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable);
                 } else {

@@ -117,7 +117,7 @@ class VehicleServiceTest {
             when(customerRepository.existsById(testRequest.customerId())).thenReturn(true);
             when(vehicleMapper.toEntity(testRequest)).thenReturn(testVehicle);
             when(vehicleRepository.save(any(Vehicle.class))).thenReturn(testVehicle);
-            when(vehicleMapper.toResponse(testVehicle)).thenReturn(testResponse);
+            when(vehicleMapper.toCreateResponse(testVehicle)).thenReturn(testResponse);
 
             VehicleResponse result = vehicleService.createVehicle(testRequest);
 
